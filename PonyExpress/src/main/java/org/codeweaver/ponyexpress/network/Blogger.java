@@ -7,6 +7,7 @@ import org.codeweaver.ponyexpress.model.blogger.PostList;
 import org.codeweaver.ponyexpress.util.ISO8906;
 
 import retrofit.Callback;
+import retrofit.RestAdapter;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -46,6 +47,15 @@ public interface Blogger {
 			@Query("maxResults") String maxResults,
 			@Query("pageToken") String pageToken, Callback<PostList> callback);
 
+	public class Builder {
+
+		public Blogger build() {
+			return new RestAdapter.Builder().setServer(BASE_URL).build()
+					.create(Blogger.class);
+		}
+
+	}
+
 	public class PostListRequestFactory {
 
 		private String	blogId;
@@ -58,10 +68,10 @@ public interface Blogger {
 		private String	maxComments;
 		private String	fields;
 
-        public PostListRequestFactory setBlogId(String id) {
-            this.blogId = id;
-            return this;
-        }
+		public PostListRequestFactory setBlogId(String id) {
+			this.blogId = id;
+			return this;
+		}
 
 		public PostListRequestFactory setStartDate(Date date) {
 			this.startDate = ISO8906.toString(date);
@@ -84,11 +94,13 @@ public interface Blogger {
 		}
 
 		public PostList execute(Blogger service) {
-			return service.listPosts(blogId, startDate, endDate, maxResults, pageToken);
+			return service.listPosts(blogId, startDate, endDate, maxResults,
+					pageToken);
 		}
 
 		public void execute(Blogger service, Callback<PostList> callback) {
-            service.listPosts(blogId, startDate, endDate, maxResults, pageToken, callback);
+			service.listPosts(blogId, startDate, endDate, maxResults,
+					pageToken, callback);
 		}
 
 	}

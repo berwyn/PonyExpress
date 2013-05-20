@@ -2,7 +2,6 @@ package org.codeweaver.ponyexpress;
 
 import org.codeweaver.ponyexpress.network.Blogger;
 
-import retrofit.RestAdapter;
 import android.app.Application;
 
 /**
@@ -10,15 +9,12 @@ import android.app.Application;
  */
 public class PonyExpress extends Application {
 
-	private RestAdapter	bloggerRestAdapter;
-	private Blogger		blogger;
+	private Blogger	blogger;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-		bloggerRestAdapter = new RestAdapter.Builder().setServer(
-				Blogger.BASE_URL).build();
-		blogger = bloggerRestAdapter.create(Blogger.class);
+		blogger = new Blogger.Builder().build();
 	}
 }
