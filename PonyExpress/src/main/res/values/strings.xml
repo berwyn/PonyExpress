@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" >Pony Express
-    </string>
-    <string name="title_story_detail" >Story Detail
-    </string>
+    <string name="app_name">Pony Express</string>
+    <string name="title_story_detail">Story Detail</string>
     <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_open_title">Sites</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string-array name="news_sources">
+        <item>Equestria Daily</item>
+    </string-array>
 
 </resources>
