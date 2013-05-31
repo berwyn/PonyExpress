@@ -12,7 +12,7 @@ dependencies {
     compile files('libs/okhttp-1.0.2.jar')
     compile files('libs/retrofit-1.0.1.jar')
     compile files('libs/volley.jar')
-    compile project('submodules:Ion:ion')
+    compile project('submodules:ion:ion')
 }
 
 android {
