@@ -1,0 +1,6 @@
+[submodule "PonyExpress/submodules/Ion"]
+	path = PonyExpress/submodules/Ion
+	url = git@github.com:koush/ion.git
+[submodule "PonyExpress/submodules/AndroidAsync"]
+	path = PonyExpress/submodules/AndroidAsync
+	url = git@github.com:koush/AndroidAsync.git

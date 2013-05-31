@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="story_list_item_textarea_padding">12dp</dimen>
+    <dimen name="story_list_item_image_size">144dp</dimen>
+    <dimen name="story_list_divider_height">12dp</dimen>
+</resources>

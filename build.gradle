@@ -1,0 +1,35 @@
+buildscript {
+    repositories { mavenCentral() }
+    dependencies { classpath 'com.android.tools.build:gradle:0.4.2' }
+}
+
+apply plugin: 'android'
+
+dependencies {
+    compile files('libs/android-support-v4.jar')
+    compile files('libs/gson-2.2.4.jar')
+    compile files('libs/jsoup-1.7.2.jar')
+    compile files('libs/okhttp-1.0.2.jar')
+    compile files('libs/retrofit-1.0.1.jar')
+    compile files('libs/volley.jar')
+    compile project('submodules:Ion:ion')
+}
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "17.0.0"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 17
+    }
+
+    buildTypes {
+        debug {
+            signingStoreLocation='debug.keystore'
+            signingStorePassword='android'
+            signingKeyAlias='androiddebugkey'
+            signingKeyPassword='android'
+        }
+    }
+}
