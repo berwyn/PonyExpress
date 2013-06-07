@@ -1,18 +1,22 @@
 buildscript {
     repositories { mavenCentral() }
-    dependencies { classpath 'com.android.tools.build:gradle:0.4.2' }
+    dependencies { classpath 'com.android.tools.build:gradle:0.4.+' }
 }
 
 apply plugin: 'android'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    compile files('libs/android-support-v4.jar')
-    compile files('libs/gson-2.2.4.jar')
-    compile files('libs/jsoup-1.7.2.jar')
-    compile files('libs/okhttp-1.0.2.jar')
-    compile files('libs/retrofit-1.0.1.jar')
-    compile files('libs/volley.jar')
-    compile project('submodules:ion:ion')
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'com.google.code.gson:gson:2.2.+'
+    compile 'com.squareup.okhttp:okhttp:1.0.+'
+    compile 'com.squareup.retrofit:retrofit:1.0.+'
+    compile 'org.jsoup:jsoup:1.7.+'
+    compile 'com.android.support:support-v4:13.0.0'
+    compile project(':submodules:ion:ion')
 }
 
 android {
