@@ -21,10 +21,10 @@ before_install:
     - export PATH=$GRADLE_HOME/bin:$PATH
 
     # install android build tools
-    - wget https://dl-ssl.google.com/android/repository/build-tools_r17-linux.zip
-    - unzip build-tools_r17-linux.zip -d $ANDROID_HOME
-    - mkdir -p $ANDROID_HOME/build-tools/
-    - mv $ANDROID_HOME/android-4.2.2 $ANDROID_HOME/build-tools/17.0.0
+    #- wget https://dl-ssl.google.com/android/repository/build-tools_r17-linux.zip
+    #- unzip build-tools_r17-linux.zip -d $ANDROID_HOME
+    #- mkdir -p $ANDROID_HOME/build-tools/
+    #- mv $ANDROID_HOME/android-4.2.2 $ANDROID_HOME/build-tools/17.0.0
 
     # Install required components.
     # For a full list, run `android list sdk -a --extended`
@@ -32,10 +32,11 @@ before_install:
     # Other relevant API's:
     #  addon-google_apis-google-16
     - echo yes | android update sdk --filter platform-tools --no-ui --force > /dev/null
-    - echo yes | android update sdk --filter android-16 --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter build-tools-17.0.0 --no-ui --force > /dev/null
     - echo yes | android update sdk --filter android-17 --no-ui --force > /dev/null
     - echo yes | android update sdk --filter sysimg-17 --no-ui --force > /dev/null
     - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter extra-google-m2repository --no-ui --force > /dev/null
 
     # Create and start emulator
     - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
