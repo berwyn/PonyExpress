@@ -28,12 +28,12 @@ android {
         targetSdkVersion 17
     }
 
-    buildTypes {
-        debug {
-            signingStoreLocation='debug.keystore'
-            signingStorePassword='android'
-            signingKeyAlias='androiddebugkey'
-            signingKeyPassword='android'
-        }
-    }
+//    buildTypes {
+//        debug {
+//            signingStoreLocation='debug.keystore'
+//            signingStorePassword='android'
+//            signingKeyAlias='androiddebugkey'
+//            signingKeyPassword='android'
+//        }
+//    }
 }
