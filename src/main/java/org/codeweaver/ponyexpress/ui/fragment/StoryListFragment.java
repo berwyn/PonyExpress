@@ -3,18 +3,18 @@ package org.codeweaver.ponyexpress.ui.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.widget.ImageView;
 import org.codeweaver.ponyexpress.PonyExpress;
 import org.codeweaver.ponyexpress.R;
 import org.codeweaver.ponyexpress.Source;
 import org.codeweaver.ponyexpress.dummy.DummyContent;
+import org.codeweaver.ponyexpress.model.Story;
 import org.codeweaver.ponyexpress.model.blogger.Blog;
+import org.codeweaver.ponyexpress.model.blogger.BloggerStoryLoader;
 import org.codeweaver.ponyexpress.model.blogger.Post;
 import org.codeweaver.ponyexpress.model.blogger.PostList;
-import org.codeweaver.ponyexpress.network.Blogger;
-import org.codeweaver.ponyexpress.util.LruBitmapCache;
-import org.codeweaver.ponyexpress.util.OkHttpStack;
+import org.codeweaver.ponyexpress.util.StoryLoader;
 import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -27,16 +27,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Cache;
-import com.android.volley.Network;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
+import com.koushikdutta.ion.Ion;
 
 /**
  * A list fragment representing a list of Stories. This fragment
@@ -115,10 +110,17 @@ public class StoryListFragment extends ListFragment {
 		int sourceOrdinal = getArguments() == null ? 0 : getArguments().getInt(
 				ARG_KEY_SOURCE, 0);
 		newsSource = Source.values()[sourceOrdinal];
-		getActivity().getActionBar().setTitle(newsSource.getDisplayName());
 		listAdapter = new NewsSourceAdapter();
 		setListAdapter(listAdapter);
-        getListView().setDivider(getResources().getDrawable(R.drawable.story_list_divider));
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		getActivity().getActionBar().setTitle(newsSource.getDisplayName());
+		getListView().setDivider(
+				getResources().getDrawable(R.drawable.story_list_divider));
 	}
 
 	@Override
@@ -196,26 +198,11 @@ public class StoryListFragment extends ListFragment {
 
 	public class NewsSourceAdapter extends BaseAdapter {
 
-		private int						LRU_MAX_SIZE	= 32 * 1024 * 1024; // 32MiB
-
-		private String					apiKey;
-		private List<Post>				posts;
-		private RequestQueue			requestQueue;
-		private Cache					requestCache;
-		private Network					requestNetwork;
-		private ImageLoader				imgLoader;
-		private ImageLoader.ImageCache	imgCache;
-		private Blogger					blogger;
-		private String					blogId;
+		private List<Story>				stories;
+		private StoryLoader<PostList>	storyLoader;
 
 		public NewsSourceAdapter() {
-			posts = new ArrayList<Post>();
-			requestCache = new DiskBasedCache(getActivity()
-					.getExternalFilesDir(null));
-			requestNetwork = new BasicNetwork(new OkHttpStack());
-			requestQueue = new RequestQueue(requestCache, requestNetwork);
-			imgCache = new LruBitmapCache(LRU_MAX_SIZE);
-			imgLoader = new ImageLoader(requestQueue, imgCache);
+			stories = new ArrayList<Story>();
 
 			switch (newsSource.getType()) {
 				case BLOGGER:
@@ -226,10 +213,9 @@ public class StoryListFragment extends ListFragment {
 
 		private void configureBlogger() {
 			// TODO FIXME Add Blogger production key at some point
-			apiKey = app.isDebuggable() ? getString(R.string.blogger_debug_key)
-					: getString(0);
-			blogger = app.getBlogger();
-			blogger.getBlogByUrl(newsSource.getRootUrl(), apiKey,
+			final String apiKey = app.isDebuggable() ? getString(R.string.blogger_debug_key)
+					: "";
+			app.getBlogger().getBlogByUrl(newsSource.getRootUrl(), apiKey,
 					new Callback<Blog>() {
 						@Override
 						public void success(Blog blog, Response response) {
@@ -237,36 +223,39 @@ public class StoryListFragment extends ListFragment {
 								Log.d(TAG, "Received blog response:\n"
 										+ response.getBody());
 							}
-							blogId = String.valueOf(blog.getId());
+							String blogId = String.valueOf(blog.getId());
+							storyLoader = new BloggerStoryLoader(app, blogId,
+									apiKey);
 							getInitialStories();
 						}
 
 						@Override
 						public void failure(RetrofitError retrofitError) {
 							// TODO Handle Blog fetch failure
-                            Log.e(TAG, "Failed to fetch blog:\n" + retrofitError.toString());
+							Log.e(TAG, "Failed to fetch blog:\n"
+									+ retrofitError.toString());
 						}
 					});
 		}
 
-		public void addPost(Post post) {
-			posts.add(post);
+		public void addStory(Story story) {
+			stories.add(story);
 			notifyDataSetChanged();
 		}
 
 		@Override
 		public int getCount() {
-			return posts.size();
+			return stories.size();
 		}
 
 		@Override
-		public Post getItem(int i) {
-			return posts.get(i);
+		public Story getItem(int i) {
+			return stories.get(i);
 		}
 
 		@Override
 		public long getItemId(int i) {
-			return getItem(i).getId();
+			return getItem(i).getID();
 		}
 
 		@Override
@@ -277,7 +266,7 @@ public class StoryListFragment extends ListFragment {
 						R.layout.story_list_item, null);
 			}
 
-			Post post = getItem(i);
+			Story post = getItem(i);
 			TextView title = (TextView) convertView
 					.findViewById(R.id.story_item_title);
 			TextView date = (TextView) convertView
@@ -285,56 +274,54 @@ public class StoryListFragment extends ListFragment {
 			ImageView img = (ImageView) convertView
 					.findViewById(R.id.story_item_image);
 
-			String imgSrc = Jsoup.parse(post.getContent()).select("img")
-					.first().attr("src");
+			String imgSrc = null;
+			Elements imgElements = Jsoup.parse(post.getContent()).select("img");
+			if (imgElements.size() > 0) {
+				imgSrc = imgElements.first().attr("src");
+			}
 
 			title.setText(post.getTitle());
 			date.setText(DateFormat.format("MMM dd, yyyy", post.getPublished()));
 
-            Ion.with(img)
-                    .load(imgSrc);
+			if (imgSrc != null) {
+				Ion.with(img).load(imgSrc);
+			} else {
+				img.setVisibility(View.GONE);
+				view.invalidate();
+			}
 
 			return convertView;
 		}
 
-		public void getInitialStories() {
-			switch (newsSource.getType()) {
-				case BLOGGER:
-					getInitalBloggerStories();
+		private Callback generateCallback() {
+			Callback callback;
+			switch (newsSource) {
+				case EQUESTRIA_DAILY:
+				default:
+					callback = new Callback<PostList>() {
+						@Override
+						public void success(PostList o, Response response) {
+							stories.addAll(o.getItems());
+							notifyDataSetChanged();
+						}
+
+						@Override
+						public void failure(RetrofitError retrofitError) {
+							// TODO FIXME
+						}
+					};
 					break;
+
 			}
+			return callback;
+		}
+
+		public void getInitialStories() {
+			storyLoader.load(generateCallback());
 		}
 
 		public void getMoreStories() {
-			switch (newsSource.getType()) {
-				case BLOGGER:
-					getMoreBloggerStores();
-					break;
-			}
-		}
-
-		private void getInitalBloggerStories() {
-			// TODO Implement Blogger story fetch
-			blogger.listPosts(blogId, apiKey, new Callback<PostList>() {
-				@Override
-				public void success(PostList postList, Response response) {
-					Log.d(TAG, "Received story list");
-					for (Post post : postList.getItems()) {
-						addPost(post);
-					}
-				}
-
-				@Override
-				public void failure(RetrofitError retrofitError) {
-					// TODO Handle post list request failure
-					Log.e(TAG, "Failed to retrieve story list:\n"
-							+ retrofitError.toString());
-				}
-			});
-		}
-
-		private void getMoreBloggerStores() {
-			// TODO Implement Blogger story fetch
+			storyLoader.loadMore(generateCallback());
 		}
 	}
 }

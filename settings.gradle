@@ -1,2 +1,0 @@
-include ':submodules:androidasync:AndroidAsync'
-include ':submodules:ion:ion'

@@ -4,10 +4,12 @@ import java.util.Date;
 
 import com.google.gson.JsonObject;
 
+import org.codeweaver.ponyexpress.model.Story;
+
 /**
- * Created by loki on 19/05/13.
+ * Created by Berwyn Codeweaver on 19/05/13.
  */
-public class Post {
+public class Post implements Story {
 
 	private long		id;
 	private JsonObject	blog;
@@ -21,7 +23,7 @@ public class Post {
 	private String[]	labels;
 	private String		customMetaData;
 
-	public long getId() {
+	public long getID() {
 		return id;
 	}
 

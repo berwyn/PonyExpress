@@ -1,7 +1,7 @@
 package org.codeweaver.ponyexpress;
 
 /**
- * Created by loki on 20/05/13.
+ * Created by Berwyn Codeweaver on 20/05/13.
  */
 public enum Source {
 

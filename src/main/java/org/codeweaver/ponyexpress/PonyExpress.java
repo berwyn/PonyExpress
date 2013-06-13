@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * Created by loki on 19/05/13.
+ * Created by Berwyn Codeweaver on 19/05/13.
  */
 public class PonyExpress extends Application {
 

@@ -15,8 +15,8 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:1.0.+'
     compile 'com.squareup.retrofit:retrofit:1.0.+'
     compile 'org.jsoup:jsoup:1.7.+'
+    compile 'com.koushikdutta.ion:ion:1.0.+'
     compile 'com.android.support:support-v4:13.0.0'
-    compile project(':submodules:ion:ion')
 }
 
 android {

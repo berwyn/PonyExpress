@@ -3,7 +3,7 @@ package org.codeweaver.ponyexpress.model.blogger;
 import java.util.Date;
 
 /**
- * Created by loki on 19/05/13.
+ * Created by Berwyn Codeweaver on 19/05/13.
  */
 public class Blog {
 
