@@ -27,13 +27,4 @@ android {
         minSdkVersion 14
         targetSdkVersion 17
     }
-
-//    buildTypes {
-//        debug {
-//            signingStoreLocation='debug.keystore'
-//            signingStorePassword='android'
-//            signingKeyAlias='androiddebugkey'
-//            signingKeyPassword='android'
-//        }
-//    }
 }
